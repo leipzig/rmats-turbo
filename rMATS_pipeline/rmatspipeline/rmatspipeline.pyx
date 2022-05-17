@@ -742,7 +742,8 @@ cdef void parse_bam(long fidx, string bam,
                     unordered_map[string,cmap[string,int]]& multis,
                     cbool issingle, int jld2, int readLength,
                     cbool variable_read_length, int dt, cbool& novelSS,
-                    long& mil, long& mel, cbool allow_clipping,
+                    long& mil, long& mel,
+                    cbool allow_clipping, cbool allow_multimapping,
                     vector[int64_t]& read_outcome_counts) nogil:
     """TODO: Docstring for parse_bam.
     :returns: TODO
@@ -804,8 +805,11 @@ cdef void parse_bam(long fidx, string bam,
 
         filter_outcome = filter_read(bread, ispaired)
         if filter_outcome != READ_USED:
-            read_outcome_counts[filter_outcome] += 1
-            continue
+            if filter_outcome == READ_NOT_NH_1 and allow_multimapping:
+                pass
+            else:
+                read_outcome_counts[filter_outcome] += 1
+                continue
 
         strand = check_strand(bread, ispaired, dt)
         if dt != FRUNSTRANDED and strand == cdot:
@@ -968,6 +972,7 @@ cdef void detect_novel(str bams, unordered_map[int,cset[string]]& geneGroup,
         long mil = args.mil
         long mel = args.mel
         cbool allow_clipping = args.allow_clipping
+        cbool allow_multimapping = args.allow_multimapping
         vector[vector[int64_t]] read_outcome_counts
 
     dt = args.dt
@@ -988,7 +993,7 @@ cdef void detect_novel(str bams, unordered_map[int,cset[string]]& geneGroup,
         parse_bam(fidx, vbams[fidx], geneGroup, genes, supple, novel_juncs[fidx],
                   exons[fidx], multis[fidx], issingle, jld2, readLength,
                   variable_read_length, dt, novelSS, mil, mel, allow_clipping,
-                  read_outcome_counts[fidx])
+                  allow_multimapping, read_outcome_counts[fidx])
 
     output_read_outcomes(read_outcome_counts, vbams, args.tmp, args.prep_prefix)
 
