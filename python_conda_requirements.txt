@@ -2,6 +2,7 @@
 Cython==0.29.21
 numpy==1.16.6
 python==3.6.12
+pytest
 #
 # Python 2 requirements
 # Cython==0.29.15

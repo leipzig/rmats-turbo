@@ -28,7 +28,7 @@ function create_and_activate_conda_env() {
 }
 
 function install_dependencies() {
-  conda install -c conda-forge -c bioconda python=3.8 samtools=1.9 || return 1
+  conda install -c conda-forge -c bioconda python=3.8 samtools=1.9 pytest || return 1
 }
 
 function main() {
